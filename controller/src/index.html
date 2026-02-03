@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>PUSIT: Terminal</title>
+    <script defer src="./alpine.min.js"></script>
+	<script defer src="./script.js"></script>
+	<link rel="stylesheet" href="./styles.css">	
+</head>
+
+<body x-data="{ open: false, page: 'home' }">
+
+	<!-- Navigation Bar -->
+	<header>
+		<!-- Navigation Bar Elements -->
+		<div class="nav-inner">
+			<div class="hamburger" @click="open = !open">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+
+			<div class="logo">PUSIT CONTROLLER</div>
+		</div>
+		
+		<!-- Navigation Bar Logic -->
+		<div class="menu" x-show="open" x-transition @click.outside="open = false">
+			<a @click="page='home'; open = false"><strong>HOME</strong></a>
+			<a @click="page='products'; open = false"><strong>PRODUCTS</strong></a>
+        </div>
+	</header>
+
+	<main>
+
+
+		<!-- Home -->		
+		<section x-show="page === 'home'">
+		    Server Statistics
+        </section>
+		
+		<!-- Settings -->		
+		<section x-show="page === 'products'">
+		   Products Configuration
+        </section>
+	</main>
+
+	<footer>
+  		© 2026 PUSIT • Open source (MIT) • <a href="https://github.com/jantibur/pusit">View Source</a>
+	</footer>
+
+</body>
+
+</html>

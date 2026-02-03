@@ -1,0 +1,15 @@
+#!/usr/bin/sh
+
+echo "[TERMINAL] COMPILING SKETCH"
+
+arduino-cli compile $HOME/projects/pusit/terminal/ --fqbn esp32:esp32:esp32wrover
+
+echo "[TERMINAL] SKETCH COMPILED"
+
+echo "[TERMINAL] UPLOADING SKETCH"
+
+arduino-cli upload $HOME/projects/pusit/terminal/ --port /dev/ttyUSB0 --fqbn esp32:esp32:esp32wrover
+
+echo "[TERMINAL] SKETCH UPLOADED"
+
+echo "[TERMINAL] SKETCH FLASHED"
