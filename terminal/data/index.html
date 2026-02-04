@@ -4,12 +4,12 @@
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<title>PUSIT: Terminal</title>
-    <script defer src="/alpine.min.js"></script>
-	<script defer src="/script.js"></script>
-	<link rel="stylesheet" href="/styles.css">	
+    <script defer src="./alpine.min.js"></script>
+	<script defer src="./script.js"></script>
+	<link rel="stylesheet" href="./styles.css">	
 </head>
 
-<body x-data="{ open: false, page: 'purchase' }">
+<body x-data="{ open: false, page: 'home' }">
 
 	<!-- Navigation Bar -->
 	<header>
@@ -21,34 +21,40 @@
 				<span></span>
 			</div>
 
-			<div class="logo">PUSIT</div>
+			<div class="logo">🦑 | <strong>PUSIT</strong></div>
 		</div>
 		
 		<!-- Navigation Bar Logic -->
 		<div class="menu" x-show="open" x-transition @click.outside="open = false">
-			<a @click="page='purchase'; open = false">Buy</a>
-			<a @click="page='deposit'; open = false">Cash-In</a>
-			<a @click="page='balance'; open = false">Balance</a>
+			<a @click="page='home'; open = false">🏠 | <strong>HOME</strong></a>
+			<a @click="page='meals'; open = false">🍽️ | <strong>MEALS</strong></a>
+			<a @click="page='snacks'; open = false">🍪 | <strong>SNACKS</strong></a>
+			<a @click="page='drinks'; open = false">🥤 | <strong>DRINKS</strong></a>
 		</div>
 	</header>
 
 	<main>
-		<!-- Products to Sell -->
-		<section x-show="page === 'purchase'">	
-		   available products (fetched from the root server);		
-		</section>
-		
-		<!-- Put a balance in their RFID card -->
-		<section x-show="page === 'deposit'">	
-			add a balance to your rfid card
-		</section>
-		
-		<!-- Check their balance -->
-		<section x-show="page === 'balance'">
-		    Check your rfid card balance
-		</section>
-		
-	</main>
+		<!-- Landing page of the kiosk -->
+		<section x-show="page === 'home'">	
+            A custom landing page...
+        </section>
+
+		<!-- Meals that can only be bought in lunch (most sought in lunch)-->
+		<section x-show="page === 'meals'">	
+            A custom meals that is available
+        </section>
+
+        <!-- Sweets or something that is tasty ( a good way to end your day )--->
+		<section x-show="page === 'snacks'">	
+            A custom snacks that is available
+        </section>
+
+        <!-- To push the food -->
+		<section x-show="page === 'drinks'">	
+            A custom drinks that is available
+        </section>
+
+    </main>
 
 	<footer>
   		© 2026 PUSIT • Open source (MIT) • <a href="https://github.com/jantibur/pusit">View Source</a>
