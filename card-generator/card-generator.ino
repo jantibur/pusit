@@ -72,33 +72,16 @@ setup()
 }
 
 void
-close_connection(EthernetClient &client)
-{
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println("Connection: close");
-}
-
-void
-send_message(EthernetClient &client, String message)
-{
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/plain");
-    client.println();
-    client.println(message);
-    client.println();
-}
-
-void
 send_uuid(EthernetClient &client, byte (&uuid)[16])
 {
     client.println("HTTP/1.1 200 OK");
+    client.println("Access-Control-Allow-Origin: *");
     client.println("Content-Type: application/octet-stream");
     client.print("Content-Length: ");
     client.println(16);
+    client.println("Connection: close");
     client.println();
     client.write(uuid, 16);
-    client.println();
 }
 
 void
@@ -114,7 +97,6 @@ send_rfid_uid_data(EthernetClient &client, MFRC522 &rfid)
         client.print("Content-Length: ");
         client.println(4); 
         client.println();
-
         client.write(rfid.uid.uidByte, 4);
     }
 
@@ -155,7 +137,7 @@ is_card_supported(MFRC522 &rfid)
 }
 
 void
-read_server_uid_block(MFRC522 &rfid)
+read_server_uid_block(MFRC522 &rfid, EthernetClient &client)
 {
     byte sector = 1;
     byte block_address = 4;
@@ -171,8 +153,7 @@ read_server_uid_block(MFRC522 &rfid)
     if (status != MFRC522Constants::STATUS_OK) {
         rfid.PICC_HaltA();
         rfid.PCD_StopCrypto1();
-        close_connection(current_client);
-        send_message("FAILED: AUTHENTICATION KEY A")
+        close_request_session(rfid, client, "FAILED: AUTH KEY A");
         requested = false;
         current_client.stop();
     } 
@@ -182,8 +163,7 @@ read_server_uid_block(MFRC522 &rfid)
     if (status != MFRC522Constants::STATUS_OK) {
         rfid.PICC_HaltA();
         rfid.PCD_StopCrypto1();
-        close_connection(current_client);
-        send_message("FAILED: READ RFID")
+        close_request_session(rfid, client, "FAILED: READ");
         requested = false;
         current_client.stop();
     }
@@ -192,7 +172,7 @@ read_server_uid_block(MFRC522 &rfid)
 }
 
 void
-write_server_uid_block(MFRC522 &rfid, byte (&data_block)[16])
+write_server_uid_block(MFRC522 &rfid, EthernetClient &client, byte (&data_block)[16])
 { 
     byte sector = 1;
     byte block_address = 4;
@@ -205,8 +185,7 @@ write_server_uid_block(MFRC522 &rfid, byte (&data_block)[16])
     if (status != MFRC522Constants::STATUS_OK) {
         rfid.PICC_HaltA();
         rfid.PCD_StopCrypto1();
-        close_connection(current_client);
-        send_message("FAILED: AUTHENTICATION KEY B")
+        close_request_session(rfid, client, "FAILED: AUTH KEY B");
         requested = false;
         current_client.stop();
     } 
@@ -216,8 +195,7 @@ write_server_uid_block(MFRC522 &rfid, byte (&data_block)[16])
     if (status != MFRC522Constants::STATUS_OK) {
         rfid.PICC_HaltA();
         rfid.PCD_StopCrypto1();
-        close_connection(current_client);
-        send_message("FAILED: WRITE RFID")
+        close_request_session(rfid, client, "FAILED: WRITE");
         requested = false;
         current_client.stop();
     }
@@ -225,11 +203,16 @@ write_server_uid_block(MFRC522 &rfid, byte (&data_block)[16])
 
 void
 close_request_session(MFRC522 &rfid,  EthernetClient &client, String message)
-{ 
+{
+
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/plain"); 
+    client.println("Access-Control-Allow-Origin: *");
+    client.println("Connection: close");
+    client.println();
+    client.println(message);
     rfid.PICC_HaltA();
     rfid.PCD_StopCrypto1();
-    send_message(current_client, message);
-    close_connection(client);
     requested = false;
     client.stop();
 }
@@ -240,7 +223,6 @@ loop()
     if (!requested) {  
         EthernetClient client = server.available();
         if (client) { 
-            send_message(client, "TAP RFID");
             requested = true;
             current_client = client;
         }
@@ -253,7 +235,7 @@ loop()
             
             if (supported) { 
                 Serial.print("BEFORE: ");
-                read_server_uid_block(rfid);
+                read_server_uid_block(rfid, current_client);
                 
                 send_rfid_uid_data(post_client, rfid);
 
@@ -287,16 +269,15 @@ loop()
                 memcpy(server_uid, &response[0], 16);
                 memcpy(uuid, &response[16], 16);  
                 
-                write_server_uid_block(rfid, server_uid);
+                write_server_uid_block(rfid, current_client, server_uid);
                 Serial.println();
                 Serial.print("AFTER: ");
-                read_server_uid_block(rfid);
+                read_server_uid_block(rfid, current_client);
                 Serial.println();
                 Serial.print("UUID: ");
                 dump_byte_array(uuid, 16);
                 Serial.println();        
                 send_uuid(current_client, uuid);
-                close_request_session(rfid, current_client, "CARD GENERATED");
             }
         }
     }
