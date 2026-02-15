@@ -72,7 +72,7 @@ setup()
 }
 
 void
-send_uuid(EthernetClient &client, byte (&uuid)[16])
+send_uuid(EthernetClient &client, MFRC522 &rfid, byte (&uuid)[16])
 {
     client.println("HTTP/1.1 200 OK");
     client.println("Access-Control-Allow-Origin: *");
@@ -82,6 +82,10 @@ send_uuid(EthernetClient &client, byte (&uuid)[16])
     client.println("Connection: close");
     client.println();
     client.write(uuid, 16);
+    client.stop();
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+    requested = false;
 }
 
 void
@@ -130,10 +134,10 @@ is_card_supported(MFRC522 &rfid)
 {
     MFRC522::PICC_Type picc_type = rfid.PICC_GetType(rfid.uid.sak);
 
-    if (picc_type != MFRC522Constants::PICC_TYPE_MIFARE_MINI && picc_type != MFRC522Constants::PICC_TYPE_MIFARE_1K && picc_type == MFRC522Constants::PICC_TYPE_MIFARE_4K) { 
-        return false;
+    if (picc_type == MFRC522Constants::PICC_TYPE_MIFARE_MINI || picc_type == MFRC522Constants::PICC_TYPE_MIFARE_1K || picc_type == MFRC522Constants::PICC_TYPE_MIFARE_4K) { 
+        return true;
     }
-    return true;
+    return false;
 }
 
 void
@@ -222,9 +226,23 @@ loop()
 { 
     if (!requested) {  
         EthernetClient client = server.available();
-        if (client) { 
-            requested = true;
-            current_client = client;
+        
+        if (client) {
+            if (client.find("GET /ping")) {
+                client.println(
+                      "HTTP/1.1 200 OK\r\n"
+                      "Content-Type: text/plain\r\n"
+                      "Access-Control-Allow-Origin: *\r\n"
+                      "Connection: close\r\n"
+                      "\r\n"
+                      "TAP"
+                );
+                client.stop();
+            } else {
+                requested = true;
+                current_client = client;
+            }
+
         }
     }
 
@@ -277,7 +295,7 @@ loop()
                 Serial.print("UUID: ");
                 dump_byte_array(uuid, 16);
                 Serial.println();        
-                send_uuid(current_client, uuid);
+                send_uuid(current_client, rfid, uuid);
             }
         }
     }
