@@ -5,8 +5,11 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
+hex = "0.4.3"
+rand = "0.9.2"
 serde_json = "1.0.149"
-sqlite = "0.37.0"
+sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio", "uuid"] }
 tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
 tower = "0.5.2"
 tower-http = { version = "0.6.8", features = ["cors"] }
+uuid = { version = "1.20.0", features = ["v4"] }
