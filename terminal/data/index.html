@@ -4,57 +4,74 @@
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<title>PUSIT: Terminal</title>
-    <script defer src="./alpine.min.js"></script>
 	<script defer src="./script.js"></script>
+    <script defer src="./alpine.min.js"></script>
 	<link rel="stylesheet" href="./styles.css">	
 </head>
 
-<body x-data="{ open: false, page: 'home' }">
-
+<body>
 	<!-- Navigation Bar -->
 	<header>
 		<!-- Navigation Bar Elements -->
 		<div class="nav-inner">
-			<div class="hamburger" @click="open = !open">
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
 
-			<div class="logo">🦑 | <strong>PUSIT</strong></div>
-		</div>
-		
-		<!-- Navigation Bar Logic -->
-		<div class="menu" x-show="open" x-transition @click.outside="open = false">
-			<a @click="page='home'; open = false">🏠 | <strong>HOME</strong></a>
-			<a @click="page='meals'; open = false">🍽️ | <strong>MEALS</strong></a>
-			<a @click="page='snacks'; open = false">🍪 | <strong>SNACKS</strong></a>
-			<a @click="page='drinks'; open = false">🥤 | <strong>DRINKS</strong></a>
+			<div class="logo">🦑 <strong>PUSIT</strong></div>
 		</div>
 	</header>
 
-	<main>
-		<!-- Landing page of the kiosk -->
-		<section x-show="page === 'home'">	
-            A custom landing page...
-        </section>
+	<main x-data="handle_products()">
+		<div x-init="get_products">
+			<header class="app-bar">
+				<h2 x-text="view === 'order' ? 'ORDER' : 'CART'"></h2>
+				<button class="cart-toggle" @click="view = view === 'order' ? 'cart' : 'order'">
+					🛒 <span class="badge" x-text="cart.length"></span>
+				</button>
+			</header>
+			<div x-show="view === 'order'" class="product-grid">
+				<template x-for="product in products" :key="product[0]">
+					<div class="product-card">
+						<div>
+							<div class="product-name" x-text="product[1]" style="font-weight: bold;"></div>
+							<div class="product-price" x-text="'₱' + product[2]"></div>
+						</div>
+						
+						<button class="button-add-to-cart" @click="add_to_cart(product)">
+							Add to Cart
+						</button>
+					</div>
+				</template>
+			</div>
 
-		<!-- Meals that can only be bought in lunch (most sought in lunch)-->
-		<section x-show="page === 'meals'">	
-            A custom meals that is available
-        </section>
+			<div x-show="view === 'cart'" class="cart-page" style="padding-bottom: 100px;">
+				<template x-if="cart.length === 0">
+					<div style="text-align:center; padding: 60px 20px; color: #757575;">
+						<div style="font-size: 50px; margin-bottom: 10px;">🛒</div>
+						<p>Your cart is empty!</p>
+						<button @click="view = 'order'" id="button-back-to-order">ORDER</button>
+					</div>
+				</template>
 
-        <!-- Sweets or something that is tasty ( a good way to end your day )--->
-		<section x-show="page === 'snacks'">	
-            A custom snacks that is available
-        </section>
+				<template x-for="(item, index) in cart" :key="index">
+					<div class="cart-item">
+						<div>
+							<div x-text="item[1]" style="font-weight: bold; color: #212121;"></div>
+							<div x-text="'₱' + item[2]" style="font-size: 14px; color: #757575;"></div>
+						</div>
+						<button @click="cart.splice(index, 1); get_cart_price()" style="color: #f44336; border: none; background: none; font-size: 12px; font-weight: bold; padding: 10px;">REMOVE</button>
+					</div>
+				</template>
 
-        <!-- To push the food -->
-		<section x-show="page === 'drinks'">	
-            A custom drinks that is available
-        </section>
+				<div class="cart-footer" x-show="cart.length"> 
+					<div>
+						<div style="font-size: 12px; color: #757575; letter-spacing: 0.5px;">TOTAL</div>
+						<div style="font-size: 20px; font-weight: bold; color: #212121;">₱<span x-text="cart_price"></span></div>
+					</div>
 
-    </main>
+					<button class="button-checkout" @click="process_order">ORDER</button>
+				</div>
+			</div>
+		</div>	
+	</main>
 
 	<footer>
   		© 2026 PUSIT • Open source (MIT) • <a href="https://github.com/jantibur/pusit">View Source</a>
@@ -63,3 +80,4 @@
 </body>
 
 </html>
+
