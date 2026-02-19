@@ -1,4 +1,4 @@
-package com.jan_tibur.pusit_controller
+package com.jan.pusit_controller
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

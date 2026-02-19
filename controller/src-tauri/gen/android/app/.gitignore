@@ -1,4 +1,4 @@
-/src/main/java/com/jan_tibur/pusit_controller/generated
+/src/main/java/com/jan/pusit_controller/generated
 /src/main/jniLibs/**/*.so
 /src/main/assets/tauri.conf.json
 /tauri.build.gradle.kts

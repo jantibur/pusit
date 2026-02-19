@@ -4,8 +4,29 @@
   padding: 0;
 }
 
+button {
+    font-family: Montserrat;
+    background-color: #FFFFFF;
+    border: 1px solid;
+    padding: 12px;
+    width: 328px;
+    text-align: center;
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url("./montserrat-regular.ttf");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url("./montserrat-bold.ttf");
+    font-weight: 700;
+}
+
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: Montserrat;
   background: #ffffff;
   color: #111;
   min-height: 100vh;
@@ -104,4 +125,55 @@ footer {
 footer a {
   color: inherit;
   text-decoration: underline;
+}
+
+
+/* Card Section */
+
+.card-statistics {
+    height: 200px;
+    display: flex;
+    text-align: center;
+}
+
+#card-created {
+    height: 175px;
+    width: 154px;
+    border: 1.5px solid #0a0a0a;
+}
+
+#card-lost {
+    height: 175px;
+    width: 154px;
+    margin-left: 20px;
+    border: 1.5px solid #0a0a0a;
+}
+
+/* Balance Section */
+
+.balance-statistics {
+    height: 200px;
+    display: flex;
+    text-align: center;
+}
+
+#total-balance {
+    height: 175px;
+    width: 328px;
+    border: 1.5px solid #0a0a0a;
+}
+
+
+/* Product Section */
+
+.product-statistics {
+    height: 200px;
+    display: flex;
+    text-align: center;
+}
+
+#product-created {
+    height: 175px;
+    width: 328px;
+    border: 1.5px solid #0a0a0a;
 }
