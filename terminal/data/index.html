@@ -27,12 +27,20 @@
 					🛒 <span class="badge" x-text="cart.length"></span>
 				</button>
 			</header>
-			<div x-show="view === 'order'" class="product-grid">
-				<template x-for="product in products" :key="product[0]">
+
+			<div x-show="view === 'order'" style="padding: 10px; position: sticky; top: 60px; z-index: 99;">
+				<div class="search-product">
+					<input type="text" id="input-search-product" x-model="search" placeholder="SEARCH">
+					<button x-show="search.length > 0" @click="search = ''" style="position: absolute; right: 10px; background: none; border: none; color: #999; font-size: 18px;">✕</button>
+				</div>
+			</div>
+			
+			<div x-show="view === 'order'" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; padding:12px;">
+				<template x-for="product in filtered_products" :key="product[0]">
 					<div class="product-card">
 						<div>
 							<div class="product-name" x-text="product[1]" style="font-weight: bold;"></div>
-							<div class="product-price" x-text="'₱' + product[2]"></div>
+							<div class="product-price-inventory" x-text="`₱ ${product[2]} • ${product[3]} left`"></div>		
 						</div>
 						
 						<button class="button-add-to-cart" @click="add_to_cart(product)">
@@ -40,8 +48,14 @@
 						</button>
 					</div>
 				</template>
-			</div>
 
+				<template x-if="filtered_products.length === 0">
+					<div style="grid-column: span 2; text-align: center; padding: 40px; color: #757575;">
+						No products found matching "<span x-text="search"></span>"
+					</div>
+				</template>
+			</div>
+		
 			<div x-show="view === 'cart'" class="cart-page" style="padding-bottom: 100px;">
 				<template x-if="cart.length === 0">
 					<div style="text-align:center; padding: 60px 20px; color: #757575;">
@@ -55,8 +69,11 @@
 					<div class="cart-item">
 						<div>
 							<div x-text="item[1]" style="font-weight: bold; color: #212121;"></div>
-							<div x-text="'₱' + item[2]" style="font-size: 14px; color: #757575;"></div>
+						<div style="font-size: 12px; color: #757575;">
+							₱<span x-text="item[2]"></span> • <span x-text="item[3]"></span> left
 						</div>
+					</div>
+
 						<button @click="cart.splice(index, 1); get_cart_price()" style="color: #f44336; border: none; background: none; font-size: 12px; font-weight: bold; padding: 10px;">REMOVE</button>
 					</div>
 				</template>
@@ -74,7 +91,7 @@
 	</main>
 
 	<footer>
-  		© 2026 PUSIT • Open source (MIT) • <a href="https://github.com/jantibur/pusit">View Source</a>
+  		© 2026 PUSIT • Open Source (MIT) • <a href="https://github.com/jantibur/pusit">View Source</a>
 	</footer>
 
 </body>

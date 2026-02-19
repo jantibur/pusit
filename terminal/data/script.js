@@ -1,4 +1,4 @@
-let server_ip = "http://192.168.1.227";
+let server_ip = "http://192.168.2.100";
 
 function
 handle_products()
@@ -8,7 +8,7 @@ handle_products()
 		cart: [],
 		cart_price: 0,
 		view: "order",
-		
+		search: '',
 		async get_products()
 		{
 			let response = await fetch(server_ip + "/get_products");
@@ -24,8 +24,12 @@ handle_products()
 				
 				for (let i = 0; i < products_data.length; i++) {
 					let product = products_data[i].split("|");
-					products.push(product);
+					if(parseInt(product[3]) > 0) {
+						products.push(product);
+					}
 				}
+				
+
 				this.products = products;
 			}
 		},
@@ -57,6 +61,17 @@ handle_products()
 			
 			let body_str = product_ids.join();
 		
-		}
+		},
+		
+		get filtered_products()
+		{
+			if (this.search.trim() === "") {
+				return this.products;    
+			} else {
+				return this.products.filter(product => {
+					return product[1].toLowerCase().includes(this.search.toLowerCase());
+				});
+			}
+		},
 	}
 }
