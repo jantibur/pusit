@@ -134,7 +134,7 @@ is_card_supported(MFRC522 &rfid)
 {
     MFRC522::PICC_Type picc_type = rfid.PICC_GetType(rfid.uid.sak);
 
-    if (picc_type == MFRC522Constants::PICC_TYPE_MIFARE_MINI || picc_type == MFRC522Constants::PICC_TYPE_MIFARE_1K || picc_type == MFRC522Constants::PICC_TYPE_MIFARE_4K) { 
+    if (picc_type == MFRC522Constants::PICC_TYPE_MIFARE_1K) { 
         return true;
     }
     return false;
