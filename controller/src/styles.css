@@ -1,16 +1,26 @@
+.no-scroll {
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Ensure the modal is strictly on top */
+[x-cloak] { display: none !important; }
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 button {
     font-family: Montserrat;
-    background-color: #FFFFFF;
-    border: 1px solid;
+    width: 100%; 
     padding: 12px;
-    width: 328px;
-    text-align: center;
+    margin-top: 20px;
+    background: #100c08; 
+    color: white; 
+    border: none; 
+    border-radius: 10px;
+    font-weight: bold;
 }
 
 @font-face {
@@ -136,7 +146,7 @@ footer a {
     text-align: center;
 }
 
-#card-created {
+#card-active {
     height: 175px;
     width: 154px;
     border: 1.5px solid #0a0a0a;
@@ -175,5 +185,26 @@ footer a {
 #product-created {
     height: 175px;
     width: 328px;
+    border: 1.5px solid #0a0a0a;
+}
+
+/* Transaction Section */
+
+.order-statistics {
+    height: 200px;
+    display: flex;
+    text-align: center;
+}
+
+#order-created {
+    height: 175px;
+    width: 154px;
+    border: 1.5px solid #0a0a0a;
+}
+
+#order-done {
+    height: 175px;
+    width: 154px;
+    margin-left: 20px;
     border: 1.5px solid #0a0a0a;
 }

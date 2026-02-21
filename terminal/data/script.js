@@ -1,4 +1,12 @@
-let server_ip = "http://192.168.2.100";
+let server_ip = "http://192.168.4.1";
+
+function show_message(text, isLocked = false) {
+    window.dispatchEvent(
+        new CustomEvent("show-message", { 
+            detail: { text: text, isLocked: isLocked } 
+        })
+    );
+}
 
 function
 handle_products()
@@ -50,17 +58,65 @@ handle_products()
 			
 			this.cart_price = price;
 		},
-		
+
 		async process_order()
 		{
-			let product_ids = [];
+            let abort_controller = new AbortController();
+            let id = setTimeout(() => abort_controller.abort(), 12000);
 
-			for (let i = 0; i < this.cart.length; i++) {
+            let product_ids = [];
+            
+            for (let i = 0; i < this.cart.length; i++) {
 				product_ids.push(`${this.cart[i][0]}`);
 			}
 			
 			let body_str = product_ids.join();
-		
+            
+            try {
+                let init = await fetch(server_ip + `/create_order?ordered_products=${encodeURIComponent(body_str)}`, {
+                    signal: abort_controller.signal 
+                });
+
+                let init_status = await init.text();
+    
+                if (init_status.trim() === "67") {
+                    show_message("TAP YOUR CARD");
+                    
+                    let is_card_read = false;
+
+                    while (!is_card_read) {
+                        let update = await fetch(server_ip + "/create_order_status");
+                        let updated_status = await update.text();
+
+                        if (updated_status.trim() === "WAITING") {
+                            await new Promise(r => setTimeout(r, 500));
+                        } else if (updated_status.trim().length == 19){
+                            window.onbeforeunload = function() { return "SAVE YOUR GENERATED BARCODE!" }; 
+
+                            show_message("GENERATED BARCODE", true);
+
+                            JsBarcode("#order-reference", updated_status.trim(), {
+                                width: 1.35,
+                                height: 100,
+                                displayValue: true
+                            });
+                            is_card_read = true;
+                        } else {
+                            show_message(updated_status);
+                            is_card_read = true;
+                        }
+                    }
+                }
+
+            } catch(e) {
+                if (e.name === "AbortError") {
+                    show_message("TIMEOUT");
+                } else {
+                    show_message(e);
+                }
+            } finally {
+                clearTimeout(id);
+            }
 		},
 		
 		get filtered_products()

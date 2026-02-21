@@ -6,11 +6,51 @@
 	<title>PUSIT: Terminal</title>
 	<script defer src="./script.js"></script>
     <script defer src="./alpine.min.js"></script>
-	<link rel="stylesheet" href="./styles.css">	
+    <script defer src="./JsBarcode.code128.min.js"></script>
+    <link rel="stylesheet" href="./styles.css">	
 </head>
 
 <body>
-	<!-- Navigation Bar -->
+    <div x-data="{ open: false, message: '', locked: false }"
+         @show-message.window="message = $event.detail.text; locked = $event.detail.isLocked; open = true;"
+         @close-message.window="open = false; locked = false;"
+         x-init="$watch('open', value => {
+            if (value) document.body.classList.add('no-scroll');
+            else document.body.classList.remove('no-scroll');
+         })"
+         x-cloak>
+
+        <div x-show="open"
+             x-transition.opacity
+             style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9998;"
+             @click="if (!locked) open = false">
+        </div>
+
+        <div x-show="open"
+             style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ffffff; padding: 24px; border-radius: 16px; text-align: center; z-index: 9999; width: 85%; max-width: 400px;">
+            
+            <h3 x-text="locked ? 'ORDER COMPLETE' : 'NOTICE'" style="margin-top: 0;"></h3>
+            <p x-text="message" style="margin-bottom: 20px;"></p>
+            
+            <div x-show="locked" style="background: white; padding: 10px; border-radius: 8px;">
+                <svg id="order-reference"></svg>
+            </div>
+
+            <button x-show="!locked" 
+                    @click="open = false"
+                    style="width: 100%; padding: 12px; margin-top: 20px; background: #100c08; color: white; border: none; border-radius: 10px;">
+                OK
+            </button>
+
+            <button x-show="locked" 
+                    @click="if(confirm('Make sure you saved the barcode! Close?')) { open = false; locked = false; window.onbeforeunload = null; location.reload(); }"
+                    style="width: 100%; padding: 12px; margin-top: 20px; background: #f44336; color: white; border: none; border-radius: 10px;">
+               CLOSE 
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
 	<header>
 		<!-- Navigation Bar Elements -->
 		<div class="nav-inner">
