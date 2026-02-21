@@ -9,6 +9,16 @@ show_message (text)
     );
 }
 
+
+function
+show_products (products, is_locked = true)
+{
+    window.dispatchEvent(
+        new CustomEvent("show-products", { detail: { text: products, isLocked: is_locked }})
+    );
+}
+
+
 function
 ask (message, labels, on_confirm)
 {
@@ -21,6 +31,30 @@ function
 card_handler()
 {
     return {
+        total_active_card: "-",
+        total_lost_card: "-",
+        
+        init()
+        {
+            this.$watch("page", value => {
+                 if (value === 'card') {
+                     this.get_statistics();
+                 }
+             });
+            if (this.page === "card") {
+                this.get_statistics();
+            }
+        },
+       
+        async get_statistics()
+        {
+            let total_active_card = await fetch(server_ip + "/get_total_active_card");
+            let total_lost_card = await fetch(server_ip + "/get_total_lost_card");
+            
+            this.total_active_card = total_active_card.text();
+            this.total_lost_card = total_lost_card.text();
+        },
+        
         async generate_card()
         {
             let abort_controller = new AbortController();
@@ -117,14 +151,14 @@ balance_handler()
         {
             this.$watch("page", value => {
                  if (value === 'balance') {
-                     this.get_total_balance();
+                     this.get_statistics();
                  }
              });
             if (this.page === "balance") {
-                this.get_total_balance();
+                this.get_statistics();
             }
         },
-        async get_total_balance()
+        async get_statistics()
         {
             let response = await fetch(server_ip + "/total_balance");
             let text = await response.text();
@@ -162,6 +196,25 @@ function
 product_handler()
 {
     return {
+        total_products: "-",
+        
+        init()
+        {
+            this.$watch("page", value => {
+                 if (value === 'product') {
+                     this.get_statistics();
+                 }
+             });
+            if (this.page === "product") {
+                this.get_statistics();
+            }
+        },
+        async get_statistics()
+        {
+            let response = await fetch(server_ip + "/get_total_products");
+            let text = await response.text();
+            this.total_products = text;
+        },
         async add_product()
         {
             ask("CREATE PRODUCT", {label1: "NAME", label2: "PRICE", label3: "INVENTORY"}, async (data) => {
@@ -210,5 +263,76 @@ product_handler()
                 }
             });
         },
+    }
+}
+
+function
+order_handler()
+{
+    return {
+        not_delivered: "-",
+        delivered: "-",
+        init()
+        {
+            this.$watch("page", value => {
+                 if (value === 'order') {
+                     this.get_statistics();
+                 }
+             });
+            if (this.page === "order") {
+                this.get_statistics();
+            }
+        },
+        async get_statistics()
+        {
+            let not_delivered = await fetch(server_ip + "/get_not_delivered");
+            let delivered = await fetch(server_ip + "/get_delivered");
+        
+            this.not_delivered = await not_delivered.text(); 
+            this.delivered = await delivered.text();
+        },
+        async deliver_order()
+        {
+            let scanner = window.__TAURI__.barcodeScanner;
+
+            try {
+                let permission = await scanner.requestPermissions();
+
+                if (permission !== "granted") {
+                    show_message("Please give camera permission");
+                    return;
+                }
+
+                let result = await scanner.scan({
+                    windowed: false,
+                    formats: ["CODE_128"]
+                });
+
+                if (result && result.content) {
+                    try {
+                        let response = await fetch(server_ip + "/deliver_order", {
+                            method: "POST",
+                            headers: { "Content-Type": "text/plain" },
+                            body: result.content
+                        });
+
+                    
+                        let text = await response.text();
+                    
+                        if (response.ok) {
+                            show_products(text.toUpperCase()); 
+                            this.get_statistics();
+                        } else {
+                            show_message(text);
+                        }
+                    } catch(e) {
+                        show_message(e);
+                    }
+                }
+            } catch(e) {
+                show_message("UNEXPECTED  ERROR");
+            }
+
+        }
     }
 }
