@@ -13,8 +13,7 @@ handle_total_balance(State(state): State<AppState>) -> Result<(StatusCode, Strin
             println!("{:?}", e);
             (StatusCode::INTERNAL_SERVER_ERROR, "-".to_string())
         })?;
-
-    println!("Returned the total balance of the economy: {:?}", total_balance);
+    
     Ok((StatusCode::OK, format!("₱{}", total_balance)))
 }
 

@@ -4,6 +4,24 @@ use crate::AppState;
 use std::fmt::Write;
 
 pub async
+fn handle_get_total_products(State(state): State<AppState>) -> Result<(StatusCode, String), (StatusCode, String)>
+{
+    let total_products_query = " 
+        SELECT COUNT(*) 
+        FROM product
+    ";
+
+    let total_products: i64 = sqlx::query_scalar(total_products_query)
+        .fetch_one(&state.database)
+        .await
+        .map_err(|_| {
+            (StatusCode::INTERNAL_SERVER_ERROR, "CANNOT GET PRODUCT COUNT".to_string())
+        })?;
+
+    Ok((StatusCode::OK, total_products.to_string()))
+}
+
+pub async
 fn handle_get_products(State(state): State<AppState>) -> Result<(StatusCode, String), (StatusCode, String)>
 {
     let get_products_query  = "
@@ -38,8 +56,14 @@ fn handle_get_products(State(state): State<AppState>) -> Result<(StatusCode, Str
                 println!("{:?}", e);
                 (StatusCode::INTERNAL_SERVER_ERROR, "Failed".to_string())
             })?;
-        
-        write!(product_string, "{}|{}|{},", id, name, price).unwrap();    
+       
+        let inventory: i64 = product.try_get("inventory")
+            .map_err(|e| {
+                println!("{:?}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, "Failed".to_string())
+            })?;
+
+        write!(product_string, "{}|{}|{}|{},", id, name, price, inventory).unwrap();    
     }
     println!("Returning Product String: {:?}", product_string); 
     Ok((StatusCode::OK, product_string))

@@ -4,6 +4,43 @@ use rand::rand_core::{TryRngCore, OsRng};
 use sqlx;
 use crate::AppState;
 
+pub async
+fn handle_get_total_lost_card(State(state): State<AppState>) -> Result<(StatusCode, String), (StatusCode, String)>
+{
+    let total_lost_card_query = " 
+        SELECT COUNT(*) 
+        FROM card
+        WHERE is_lost = 1
+    ";
+
+    let total_lost_card: i64 = sqlx::query_scalar(total_lost_card_query)
+        .fetch_one(&state.database)
+        .await
+        .map_err(|_| {
+            (StatusCode::INTERNAL_SERVER_ERROR, "CANNOT GET LOST CARD COUNT".to_string())
+        })?;
+
+    Ok((StatusCode::OK, total_lost_card.to_string()))
+}
+
+pub async
+fn handle_get_total_active_card(State(state): State<AppState>) -> Result<(StatusCode, String), (StatusCode, String)>
+{
+    let total_active_card_query = " 
+        SELECT COUNT(*) 
+        FROM card
+        WHERE is_lost = 0
+    ";
+
+    let total_active_card: i64 = sqlx::query_scalar(total_active_card_query)
+        .fetch_one(&state.database)
+        .await
+        .map_err(|_| {
+            (StatusCode::INTERNAL_SERVER_ERROR, "CANNOT GET ACTIVE CARD COUNT".to_string())
+        })?;
+
+    Ok((StatusCode::OK, total_active_card.to_string()))
+}
 
 pub fn
 generate_server_uid() -> [u8; 16]
