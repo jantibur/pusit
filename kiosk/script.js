@@ -1,4 +1,5 @@
-let server_ip = "http://192.168.4.1";
+let server_ip = "http://192.168.2.100";
+let reader_ip = "http://192.168.2.101";
 
 function show_message(text, isLocked = false) {
     window.dispatchEvent(
@@ -73,8 +74,8 @@ handle_products()
 			let body_str = product_ids.join();
             
             try {
-                let init = await fetch(server_ip + `/create_order?ordered_products=${encodeURIComponent(body_str)}`, {
-                    signal: abort_controller.signal 
+                let init = await fetch(reader_ip + `/create_order?ordered_products=${encodeURIComponent(body_str)}`, {
+					signal: abort_controller.signal,
                 });
 
                 let init_status = await init.text();
@@ -85,10 +86,10 @@ handle_products()
                     let is_card_read = false;
 
                     while (!is_card_read) {
-                        let update = await fetch(server_ip + "/create_order_status");
+                        let update = await fetch(reader_ip + "/create_order_status");
                         let updated_status = await update.text();
 
-                        if (updated_status.trim() === "WAITING") {
+                        if (updated_status.trim() ===  "NOT WAITING" || updated_status.trim() === "WAITING") {
                             await new Promise(r => setTimeout(r, 500));
                         } else if (updated_status.trim().length == 19){
                             window.onbeforeunload = function() { return "SAVE YOUR GENERATED BARCODE!" }; 
@@ -96,8 +97,8 @@ handle_products()
                             show_message("GENERATED BARCODE", true);
 
                             JsBarcode("#order-reference", updated_status.trim(), {
-                                width: 1.35,
-                                height: 100,
+                                width: 2,
+                                height: 200,
                                 displayValue: true
                             });
                             is_card_read = true;

@@ -71,29 +71,10 @@ handle_deliver_order(State(state): State<AppState>, body: String) -> Result<(Sta
         return Err((StatusCode::UNAUTHORIZED, "ALREADY DELIVERED".to_string()))
     }
 
-    let product_id_str: String = order.get("product");
-   
-    let product_ids: Vec<&str> = product_id_str.split(",").collect();
-
-    
+    let product_names_str: String = order.get("product");
+ 
     let mut tx = state.database.begin().await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Database transaction failed".to_string()))?;
-
-    let mut product_names: Vec<String> = Vec::new();
-
-    for product_id in product_ids {
-        let product_name_row = sqlx::query("SELECT name FROM product WHERE id = ?;")
-            .bind(product_id)
-            .fetch_one(&mut *tx)
-            .await
-            .map_err(|_| {
-                (StatusCode::INTERNAL_SERVER_ERROR, "CANNOT GET PRODUCT NAMES".to_string())
-            })?;
-
-        let product_name: String = product_name_row.get("name");
-
-        product_names.push(product_name);
-    }
 
     let set_delivered_query = "
         UPDATE `order`
@@ -113,9 +94,7 @@ handle_deliver_order(State(state): State<AppState>, body: String) -> Result<(Sta
     tx.commit().await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "FAILED TO COMMIT TRANSACTION".to_string()))?;
 
-    let product_name_str = product_names.join(" | ");
-
-    Ok((StatusCode::OK, product_name_str))
+    Ok((StatusCode::OK, product_names_str))
 }
 
 
@@ -180,6 +159,7 @@ handle_create_order(State(state): State<AppState>, body: Bytes) -> Result<(Statu
         .await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "FAILED TO UPDATED BALANCE".to_string()))?;
 
+
     for product_id in &ordered_products {
         sqlx::query("UPDATE product SET inventory = inventory - 1 WHERE id = ? AND inventory > 0")
             .bind(product_id)
@@ -189,9 +169,30 @@ handle_create_order(State(state): State<AppState>, body: Bytes) -> Result<(Statu
     }
 
     let reference = format!("{}{:05}", Utc::now().format("%Y%m%d%H%M%S"), rand::random::<u16>());
+   
+    let mut ordered_products_name: Vec<String> = Vec::new();
     
+    for product_id in &ordered_products {
+        let product_names = sqlx::query("SELECT name FROM product WHERE id = ?")             
+            .bind(product_id)
+            .fetch_one(&mut *tx) 
+            .await
+            .map_err(|_| (StatusCode::NOT_FOUND, format!("Product {} not found", product_id)))?;
+        
+        let product_name: String = product_names.try_get("name")
+            .map_err(|e| {
+                println!("{:?}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, "Failed".to_string())
+            })?;
+
+        ordered_products_name.push(product_name);
+    }
+
+    let ordered_products_name_str = ordered_products_name.join(",");
+
     sqlx::query("INSERT INTO `order` (product, reference, is_delivered) VALUES (?, ?, ?)")
-        .bind(&ordered_products_str)
+        // Change this to ordered_products_name_str
+        .bind(&ordered_products_name_str)
         .bind(&reference)
         .bind(0 as i64)
         .execute(&mut *tx)
