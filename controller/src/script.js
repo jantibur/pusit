@@ -318,9 +318,10 @@ order_handler()
 
                     
                         let text = await response.text();
-                    
+                        let products = text.toUpperCase().split(",").join(" | ");
+
                         if (response.ok) {
-                            show_products(text.toUpperCase()); 
+                            show_products(products); 
                             this.get_statistics();
                         } else {
                             show_message(text);
