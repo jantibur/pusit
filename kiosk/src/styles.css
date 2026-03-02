@@ -1,16 +1,14 @@
-/* Prevent scrolling when the barcode is active */
 .no-scroll {
     overflow: hidden;
     height: 100vh;
 }
 
-/* Ensure the modal is strictly on top */
 [x-cloak] { display: none !important; }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -27,54 +25,50 @@
 }
 
 body {
-  font-family: Montserrat;
-  background: #ffffff;
-  color: #111;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    font-family: Montserrat;
+    background: #ffffff;
+    color: #111;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Navbar */
 header {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
 }
 
 .nav-inner {
-  width: 100%;
-  max-width: 768px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    max-width: 768px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Logo */
 .logo {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 0.04em;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
 }
 
-
-/* Main content */
 main {
-  flex: 1;
-  padding: 24px 16px;
-  max-width: 768px;
-  width: 100%;
-  margin: 0 auto;
+    flex: 1;
+    padding: 24px 16px;
+    max-width: 768px;
+    width: 100%;
+    margin: 0 auto;
 }
 
-/* Footer */
 footer {
 	font-size: 0.75rem;
 	color: #555;
@@ -84,8 +78,8 @@ footer {
 }
 
 footer a {
-  color: inherit;
-  text-decoration: underline;
+    color: inherit;
+    text-decoration: underline;
 }
 
 .product-grid {
