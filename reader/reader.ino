@@ -44,7 +44,10 @@ setup()
     SPI.begin(18, 19, 23, RC522_SS_PIN);
 
     rfid.PCD_Init();
+    
+    
     WiFi.mode(WIFI_STA);
+
     WiFi.begin(station_ssid, station_password);
 
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");

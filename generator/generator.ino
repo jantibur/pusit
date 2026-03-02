@@ -20,6 +20,9 @@ byte mac[] = { 0x02, 0x12, 0x34, 0x56, 0x78, 0x9A };
 
 /* Change the subnet depending on router setup */
 IPAddress ip(192, 168, 2, 200);
+IPAddress dns(192, 168, 2, 1);
+IPAddress gateway(192, 168, 2, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 /* Change the subnet depending on the router setup */
 IPAddress root_server(192, 168, 2, 100);
@@ -29,11 +32,12 @@ EthernetServer server(80);
 MFRC522::MIFARE_Key key;
 MFRC522::StatusCode status;
 
-
 EthernetClient current_client;
 bool requested = false;
 
 EthernetClient post_client;
+
+unsigned long request_start_time = 0;
 
 void
 setup() 
@@ -54,7 +58,7 @@ setup()
 
     Ethernet.init(ETHERNET_SS_PIN);
     
-    Ethernet.begin(mac, ip);
+    Ethernet.begin(mac, ip, dns, gateway, subnet);
 
 
     if (Ethernet.hardwareStatus() == EthernetNoHardware) {
@@ -241,12 +245,18 @@ loop()
             } else {
                 requested = true;
                 current_client = client;
+                request_start_time = millis();
             }
 
         }
     }
 
     if (requested) { 
+        if (millis() - request_start_time > 5000) {
+            close_request_session(rfid, current_client, "TIMEOUT");
+            return;
+        }
+
         if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {        
 
             bool supported = is_card_supported(rfid);
