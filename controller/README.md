@@ -1,7 +1,10 @@
-# Tauri + Vanilla
+# Controller 
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
+Using this controller, the staff from the canteen can interact with the PUSIT system.
 
-## Recommended IDE Setup
+Here are the functions that they can do:
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- They can add a balance based on card identification
+- They can generate a card that the PUSIT system can recognize
+- They can add a product to show in the kiosk
+- They can deliver the product based on the generated barcode on the kiosk
