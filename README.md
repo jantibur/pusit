@@ -1,8 +1,9 @@
 # PUSIT
 
-A simple integrated electronic payment and canteen sales management system using internet of things. 
+A simple integrated electronic payment and canteen sales management system using internet of things 
 
 ## Architecture
+![System Architecture](./architecture.png)
 
 ## Hardwares
 - GENERATOR
