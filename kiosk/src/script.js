@@ -103,7 +103,8 @@ handle_products()
                             });
                             is_card_read = true;
                         } else {
-                            show_message(updated_status);
+                            window.onbeforeunload = function() { return "PLEASE PUT ENOUGH BALANCE TO YOUR CARD" }; 
+                            show_message(updated_status, true);
                             is_card_read = true;
                         }
                     }
