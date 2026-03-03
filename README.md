@@ -4,6 +4,7 @@ A simple integrated electronic payment and canteen sales management system using
 
 ## Architecture
 ![System Architecture](./architecture.png)
+Note: Given that all components are connected to the router!
 
 ## Hardwares
 - GENERATOR
@@ -21,4 +22,4 @@ A simple integrated electronic payment and canteen sales management system using
 
 
 ## NOTE
-This project is in beta and it is tested only in a small canteen environment to assess the project effectiveness in improving the efficiency of payment transactions and order processing at canteen settings.
+This project is in beta and it is tested only in a small canteen environment to assess the project effectiveness in improving the efficiency of payment transactions and order processing at canteen setting.
